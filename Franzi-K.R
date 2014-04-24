@@ -1,1 +1,2 @@
-print("hello!")
+# das klassische
+print("hello world!")
