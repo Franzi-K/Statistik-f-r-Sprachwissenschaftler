@@ -96,8 +96,7 @@ tabelle.rel <- tabelle / total
 print(tabelle.rel)
 
 # Vervollständigen Sie folgende Zeile, sodass Prozentwerte aus den relative 
-# Häufigkeiten entstehen: tabelle.prozent <- tabelle.rel code_hier 
-# print(tabelle.prozent)
+# Häufigkeiten entstehen: 
 tabelle.prozent <- tabelle.rel *100
 print(tabelle.prozent)
 
