@@ -104,7 +104,7 @@ Schiefe (*skewness*) beschriebt die (A)Symmetrie einer Verteilung. Eine Verteilu
 
 Die Verteilung von Noten ist oft schief mit mehr guten Noten. Ist die Verteilung rechts- oder linksschief?
 
-antwort_hier
+linksschief
 
 Vielleicht hilft folgende Grafik mit der Visualisierung:
 
@@ -118,12 +118,15 @@ Wir können die Perzentile in (absolute) Häufigkeiten übersetzen. Nehmen wir a
 ```{r}
 n <- 50
 noten.dist$Anzahl <- noten.dist$P * n
-noten.dist
+noten.dist 
 ```
 
 Jetzt können wir die absoluten Häufigkeiten auch plotten:
 
-code_block_hier
+```{r}
+library(ggplot2)
+ggplot(data=noten.dist,aes(x=Notenpunkte,y=Anzahl,color=Standardabweichung)) + geom_line() + scale_x_continuous(limits=c(0,16)) 
+```
 
 Beantworten Sie ein paar Fragen über die Verteilung, indem Sie den passenden R-Code einsetzen:
 
@@ -134,16 +137,17 @@ Beantworten Sie ein paar Fragen über die Verteilung, indem Sie den passenden R-
     Wichtig: bei Wahrscheinlichkeits- und Häufigkeitsverteilung ist der linke Rand inklusiv aber der rechte Rand exklusiv! Das heißt, wir zählen hiermit die Leute, die bis zu 9 NP bekommen haben aber nicht die, die tatsächlich 9 NP bekommen haben!
 
 2. Wie viele Studenten bekommen zumindest 10 NP?
+    
+   `r (pnorm(9,mean=mu,sd=3, lower.tail=FALSE) * n)` Studenten bekommen zumindest 10 Notenpunkte.
 
-    `code_hier` Studenten bekommen zumindest 10 Notenpunkte.
 
 3. Wie viele Studenten bekommen weniger als 10 NP?
 
-    `code_hier` Studenten bekommen weniger als 10 Notenpunkte.
+   `r (pnorm(9,mean=mu,sd=3) * n)` Studenten bekommen weniger als 10 Notenpunkte.
 
 4. Wie viele Studenten bekommen weniger als 8 NP?
 
-    `code_hier` Studenten bekommen weniger als 8 Notenpunkte.
+   `r (pnorm(7,mean=mu,sd=3) * n)` Studenten bekommen weniger als 8 Notenpunkte.
 
 
 (Die Einrückung mit 4 Leerschlägen ist die Syntax für mehrere Absätze pro Punkt auf der Liste.)
@@ -155,29 +159,35 @@ Um überdurchschnittlich zu sein, muss man mehr als `r qnorm(0.5,mean=mu,sd=3)` 
 
 Nicht so überraschend, dass "überdurchschnittlich" auch "mehr Punkte als den Durchschnitt bekommen" heißt! Wie sieht es aus, wenn wir besser als 99% der anderen abschließen möchten?
 
-Um in dem besten 1% abzuschließen, muss man zumindest `code_hier` Notenpunkte bekommen.
+Um in dem besten 1% abzuschließen, muss man zumindest `r qnorm(0.99,mean=mu,sd=3)` Notenpunkte bekommen.
 
 ## z-Transformation
 Bei der Überprüfung der Lehrqualität scheint es der Verwaltung, dass ein gewisser Dozent andere Noten als andere Dozenten vergibt. Es wird entschieden, dass der Notenspiegel bei den Teilnehmern in einem von seinen Kursen getestet wird, um zu schauen, ob er sich von signifikant von der idealisierten Notenverteilung ($\mu=8,\sigma=3$) unterscheidet. Um zu zeigen, dass Gott $\alpha=0.06$ so viel liebt wie $\alpha=0.05$ `r citep("10.1037/0003-066X.44.10.1276")`, setzt die Verwaltung das Signikanzniveau auf 0.06. 
 
-Der kritische Wert für einen einseitigen $z$-Test ist `code_hier`.
+Der kritische Wert für einen einseitigen $z$-Test ist `r qnorm(0.94)`.
 
-Die kritischen Werte für einen zweiseitigen $z$-Test sind $\pm$`code_hier`.
+Die kritischen Werte für einen zweiseitigen $z$-Test sind $\pm$`r qnorm(0.97)`.
 
 ### Gibt es einen Unterschied?
 Bei diesem Dozenten ist die Verwaltung wirklich unsicher, ob und was für einen Unterschied es geben könnte. (Welche Testart sollte man hier nutzen?)
 
 In einem kleinen Seminar mit 7 Studenten beträgt der Durchschnittswert 10. Unterscheidet sich der Notenspiegel von dem idealen? Berechnen Sie den $z$-Test:
 
-code_hier
+``` {r}
+zt.n7 <- sqrt(7) * ((10 - 8)/3)
+print(zt.n7)
+```
 
-Das ist ein **_eins_von_signifikanter_insignifikanter_** Unterschied. 
+Das ist ein **insignifikanter** Unterschied, da 1.76 < 1.88
 
 In einer Vorlesung vom selben Dozenten mit 50 Teilnehmern beträgt der Durchschnittswert wieder 10. (Es scheint, dass der Dozent 10 besonders toll findet.) Berechnen Sie den $z$-Test:
 
-code_hier
+``` {r}
+zt.n50 <- sqrt(50) * ((10 - 8)/3)
+print(zt.n50)
+```
 
-Das ist ein **_eins_von_signifikanter_insignifikanter_** Unterschied. 
+Das ist ein **signifikanter** Unterschied, da 4.71 > 1.88
 
 Ist die Benotung vom Dozenten weniger als ideal? 
 
@@ -188,17 +198,24 @@ In einem mittelgroßen Seminar mit 20 Studenten beträgt der Durchschnittswert 7
 
 Berechnen Sie den $z$-Test:
 
-code_hier
+``` {r}
+zt.n20 <- sqrt(20) * ((7 - 8)/ 3)
+print(zt.n20)
+```
 
-Das ist ein **_eins_von_signifikanter_insignifikanter_** Unterschied. 
+Das ist ein **insignifikanter** Unterschied, da 1.49 < 1.55 
 
 Später ergibt sich, dass es eigentlich 25 Studenten im Kurs gab. (Der Dozent hat "einen Tippfehler" gemacht, als er seine Teilnehmerzahl per Mail an die Verwaltung geschickt hat.) Der Durchschnittswert bleibt -- behauptet der Dozent -- immer noch bei 7. Er behauptet weiterhin, dass das wunderbar nah am Erwartungswert (8) ist, und dass man ihn in Ruhe lassen sollte. Ist er zu streng?
 
 Berechnen Sie den $z$-Test:
 
-code_hier
+``` {r}
+zt.n25 <- sqrt(25) * ((7 - 8)/ 3)
+print(zt.n25)
+```
 
-Das ist ein **_eins_von_signifikanter_insignifikanter_** Unterschied. 
+Das ist ein **signifikanter** Unterschied, da 1.66 > 1.55
+ 
 
 ## Zum Überlegen
 Gibt es einen Grund, weshalb die Noten normal verteilt sein sollten? Warum ist das die übliche Annahme?
