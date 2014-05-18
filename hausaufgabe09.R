@@ -40,7 +40,7 @@ library(car)
 # car steht übrigens für "Companion to Appled Regression"
 
 # und danach die Daten:
-rt <- read.table("punkt_rt.tab",header=TRUE)
+rt <- read.table("Kubald//punkt_rt.tab",header=TRUE)
 # Die Daten sind Reaktionszeiten von zwei Versuchspersonen auf einen weißen
 # Punkt auf einem schwarzen Bildschirm. Die Verzögerung (delay) zwischen Trials
 # (Läufen) war zufällig und mitaugenommen. 
@@ -50,14 +50,15 @@ rt <- read.table("punkt_rt.tab",header=TRUE)
 # (http://osdoc.cogsci.nl/) auch zu Hause ausführen!)
 
 # Wir schauen uns erst mal eine Zusammenfassung der Daten an:
-# print(summary(rt))
+print(summary(rt))
 
 # Wir sehen sofort, dass R die Variabel "subj" als numerische Variable
 # behandelt hat, obwohl sie eigentlich kategorisch ist. Das müssen wir ändern:
-# rt$subj <- as.factor(rt$subj)
+rt$subj <- as.factor(rt$subj)
+print(summary(rt))
 # 
-# rt.plot <- qplot(x=RT,color=subj,fill=subj,data=rt, geom="density",alpha=I(0.3))
-# print(rt.plot)
+rt.plot <- qplot(x=RT,color=subj,fill=subj,data=rt, geom="density",alpha=I(0.3))
+print(rt.plot)
 
 # Haben die Daten der beiden Gruppen -- die wiederholten Messwerte der einzelnen
 # Probanden bilden ja Gruppen -- homogene Varianz? Bevor Sie irgendwelche Tests 
@@ -69,13 +70,17 @@ rt <- read.table("punkt_rt.tab",header=TRUE)
 # Sie von vorneherein etwas behaupten haben.
 
 # Berechnen Sie jetzt den F-Test:
-#print(CODE_HIER)
+subj.1.rt <- rt[rt$subj == "1", "RT"]
+subj.2.rt <- rt[rt$subj == "2", "RT"]
+var.test(subj.1.rt, subj.2.rt)
 
 # Sind die Varianzen homogen? Vergessen Sie nicht, dass die Nullhypothese beim
 # F-Test "Varianzen Gleich" ist.
+# Der errechnete p-Wert ist mit 0.04 < 0,05 und damit signifikant. Die H0 kann dadurch zurückgewiesen werden. 
+# Die Varianz ist ungleich verteilt.
 
 # Berechenen Sie den Levene Test:
-#print(CODE_HIER)
+leveneTest() 
 
 # Sind die Varianzen homogen? Vergessen Sie nicht, dass die Nullhypothese beim
 # Levene Test "Varianzen Gleich" ist.
@@ -84,61 +89,97 @@ rt <- read.table("punkt_rt.tab",header=TRUE)
 # eine Korrektur der Freiheitsgerade macht. Bei homogener Varianz sollten beide
 # Variante ähnliche bzw. (fast) gleiche Ergebnisse liefern. Ist das hier der
 # Fall?
-# two.sample <- CODE_HIER
-# welch <- CODE_HIER
 
-# print(two.sample)
-# print(welch)
+two.sample <- t.test(subj.1.rt, subj.2.rt,var.equal=TRUE)
+
+welch <- t.test(subj.1.rt, subj.2.rt)
+
+print(two.sample)
+
+print(welch)
+
+# Die Ergebnisse sind ähnlich. Daher entsteht eine homogene Varianz.
+
 
 # Das Ergebnis der verschiedenen Test-Funktionen in R ist übrigens eine Liste.
 # Wir können das ausnutzen, um zu schauen, ob es einen Unterschied zwischen den
 # beiden Testverfahren gab. Wenn die Varianz homogen war, sollten wir keinen
 # Unterschied sehen:
-# t.diff <- welch$statistic - two.sample$statistic
-# print(paste("Die Differenz zwischen den beiden t-Werten ist",t.diff,"."))
+t.diff <- welch$statistic - two.sample$statistic
+print(paste("Die Differenz zwischen den beiden t-Werten ist",t.diff,"."))
 
 # Sind die Daten normal verteilt? Wir berechnen Sie den Shapiro Test für erste Versuchsperson:
-# shapiro <- shapiro.test(rt[rt$subj==1,"RT"])
-# 
-# print(shapiro)
+shapiro <- shapiro.test(rt[rt$subj==1,"RT"]) 
+print(shapiro)
+# Da der p-Wert nicht <0,05 ist und damit nicht signifikant, weichen die Daten nicht von der Normalverteilung ab.
 
 # Wir können auch "Entscheidungen" im Code treffen. Die Syntax dafür ist wie
 # folgt -- die runden und geschweiften Klammern sind alle sehr wichtig!
-# if (shapiro$p.value > 0.05){
-#   print("Shapiro's test insignikant, die Daten sind normal verteilt.")
-# }else{
-#   print("Shapiro's test signikant, die Daten sind nicht normal verteilt.")
-# }
+if (shapiro$p.value > 0.05){
+print("Shapiro's test insignikant, die Daten sind normal verteilt.")
+}else{
+print("Shapiro's test signikant, die Daten sind nicht normal verteilt.")
+ }
 
 # Berechnen Sie Shapiro's Test für die andere Versuchsperson und drücken Sie mit
 # einem if-Block aus, ob die Daten normal verteilt sind.
 
-# CODE_HIER
+shapiro <- shapiro.test(rt[rt$subj==2,"RT"])
+print(shapiro)
+if (shapiro$p.value > 0.05){
+print("Shapiro's test insignikant, die Daten sind normal verteilt.")
+}else{  
+  print("Shapiro's test signikant, die Daten sind nicht normal verteilt.")
+}
 
 # Wir haben auch Transformationen bei schiefen Datenverteilungen angesprochen.
 # Die logaritmische Verteilung ist ziemlich beliebt bei Reaktionszeitsdaten.
 
-# rt$logRT <- log(rt$RT)
-# print(summary(rt$logRT))
-# logrt.plot <- CODE_HIER
-# print(logrt.plot)
+rt$logRT <- log(rt$RT)
+print(summary(rt$logRT))
+logrt.plot <- qplot(x=rt$logRT,color=subj,fill=subj,data=rt, geom="density",alpha=I(0.3))
+print(logrt.plot)
 
 # Sieht die Verteilung besser aus? Sind die Varianzen "homogener" geworden? 
 # Berechnen Sie den F-Test und den Levene-Test für die logaritmisch skalierten 
 # Daten. Nach jedem Test sollten Sie auch programmatisch (=durch if-Blöcke)
 # ausdrücken, ob die Varianzen homogen sind.
 
-# CODE_HIER
+subj.1.logRT <- rt[rt$subj == "1", "logRT"]
+subj.2.logRT <- rt[rt$subj == "2", "logRT"]
+F.Test <- var.test(subj.1.logRT, subj.2.logRT)
+print(F.Test)
+
+if (F.Test$p.value > 0.05){
+  print("F-test ist insignifikant, die Daten sind homogen verteilt.")
+}else{
+  print("F-test ist signifikant, die Daten sind nicht homogen verteilt.")
+}
 
 # Sind die Daten "normaler" gewordern? Berechnen Sie den Shapiro-Test für beide 
 # Gruppen. Nach jeder Gruppe sollten Sie auch programmatisch (=durch if-Blöcke)
 # ausdrücken, ob die Daten normal verteilt sind. 
 # (Für die fortgeschrittenen: hier könnte man auch eine for-Schleife nutzen...)
 
-# CODE_HIER
+shapiro.1 <- shapiro.test(subj.1.logrt)
+
+if (shapiro.1$p.value > 0.05){
+  print ("Shapiro´s test ist insignifikant, die Daten sind normalverteilt.")
+}else{
+  print("Shaptiro´s test ist signifikant, die Daten sind nicht normalverteilt")
+}
+
+shapiro.2 <- shapiro.test(subj.2.logrt)
+
+if (shapiro.2$p.value > 0.05){
+  print ("Shapiro´s test ist insignifikant, die Daten sind normalverteilt.")
+}else{
+  print("Shaptiro´s test ist signifikant, die Daten sind nicht normalverteilt")
+}
 
 # Hat die logarithmische Transformation insgesamt geholfen? Berechnen Sie zum
 # Schluss den (Welch) t-Test für die logarithmischen Daten. Bekommen Sie das
 # gleiche Ergebnisse wie bei den Ausgangsdaten?
 
-# CODE_HIER
+logT.test <- t.test(subj.1.logrt, subj.2.logrt)
+print(logT.test)
