@@ -40,7 +40,7 @@ library(car)
 # car steht übrigens für "Companion to Appled Regression"
 
 # und danach die Daten:
-rt <- read.table("punkt_rt.tab",header=TRUE) 
+rt <- read.table("punkt_rt.tab",header=TRUE)
 # Die Daten sind Reaktionszeiten von zwei Versuchspersonen auf einen weißen
 # Punkt auf einem schwarzen Bildschirm. Die Verzögerung (delay) zwischen Trials
 # (Läufen) war zufällig und mitaugenommen. 
