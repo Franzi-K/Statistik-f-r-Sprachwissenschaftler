@@ -1,7 +1,7 @@
 # Hausaufgabe 09
-# Phillip Alday <phillip.alday@staff.uni-marburg.de>
-# 2014-05-02
-# Dieses Werk ist lizenziert unter einer CC-BY-NC-SA Lizenz.
+# Franziska Kubald <Kubald@students.uni-marburg.de>
+# 2014-05-18
+# Dieses Werk dient Prüfungszwecken.
 
 
 # Die nächsten Punkte sollten langsam automatisch sein...
