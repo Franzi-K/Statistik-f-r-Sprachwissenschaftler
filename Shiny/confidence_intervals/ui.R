@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 library(shiny)
+require(markdown)
 
 shinyUI(fluidPage(
   titlePanel("Confidence Intervals"),
@@ -65,6 +66,7 @@ shinyUI(fluidPage(
     )
     ,mainPanel(h2("Sample distributions")
                ,plotOutput("sample.distributions",height=768)
+               ,includeMarkdown("confidence_intervals.md")
 
     )
   )
